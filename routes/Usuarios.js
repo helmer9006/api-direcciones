@@ -3,12 +3,11 @@ const router = express.Router();
 const usuarioController = require("../controllers/UsuariosController");
 const { check } = require("express-validator");
 const auth = require("../middleware/auth");
-const upload = require("../libs/storage");
 const createFoto = require("../libs/createFoto");
 
 router.post(
   "/",
-  // auth,
+  auth,
   createFoto,
   [
     check("nombre", "El Nombre es Obligatorio").not().isEmpty(),

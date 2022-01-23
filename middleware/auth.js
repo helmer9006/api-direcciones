@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-require("dotenv").config({ path: "variables.env" });
+// require("dotenv").config({ path: "variables.env" });
 
 module.exports = (req, res, next) => {
   console.log("POST - AUTENTICACIÓN");

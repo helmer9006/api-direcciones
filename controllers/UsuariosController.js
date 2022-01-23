@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 
 const nuevoUsuario = async (req, res) => {
   // Mostrar mensajes de error de express validator
-  console.log("POST - CREAR USUARIO")
+  console.log("POST - CREAR USUARIO");
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
     return res.status(400).json({ errores: errores.array() });
@@ -16,7 +16,7 @@ const nuevoUsuario = async (req, res) => {
   //validar que el usuario no esté creado previamente
 
   // return
-  
+
   let usuario = await Usuario.findOne({ $or: [{ email }, { identificacion }] });
   if (usuario) {
     return res.status(400).json({ msg: "El usuario ya esta registrado" });
@@ -25,7 +25,7 @@ const nuevoUsuario = async (req, res) => {
   // Crear un nuevo usuario
   usuario = new Usuario(req.body);
 
-  if (req.foto !== '') {
+  if (req.foto !== "") {
     usuario.setFotoUrl(req.filename);
   }
 
@@ -56,9 +56,9 @@ const actualizarUsuario = async (req, res) => {
     usuario.password = await bcrypt.hash(password, salt);
   }
   usuario = new Usuario(req.body);
-  if (req.foto !== '') {
-    //#region 
-     //pendiente borrar archivo imagen antes de gaurdar url nuevo archivo
+  if (req.foto !== "") {
+    //#region
+    //pendiente borrar archivo imagen antes de gaurdar url nuevo archivo
     // const userOld = await Usuario.find({_id: idUsuario});
     // const foto = userOld.foto
     // const fotoBorrar = foto.replace(/xmas/i, "Christmas");
@@ -95,11 +95,19 @@ const actualizarUsuario = async (req, res) => {
 };
 
 const traerUsuario = async (req, res) => {
-  try {
-    const usuarios = await Usuario.find({});
-    res.status(200).json(usuarios);
-  } catch (error) {
-    return res.status(500).json({ msg: `Ha ocurrido un error, ${error} ` });
+  const { perfil, nombre } = req.usuario;
+  //Valido perfil
+  if (perfil == "administrador") {
+    try {
+      const usuarios = await Usuario.find({});
+      res.status(200).json(usuarios);
+    } catch (error) {
+      return res.status(500).json({ msg: `Ha ocurrido un error, ${error} ` });
+    }
+  } else {
+    return res.status(403).json({
+      msg: `Acceso no autorizado, el usuario ${nombre} con perfil ${perfil} no tiene autorización para listar los usuarios`,
+    });
   }
 };
 

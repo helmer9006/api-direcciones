@@ -23,6 +23,7 @@ app.use(express.urlencoded({ limit: "50mb" }));
 // Rutas de la app
 app.use("/api/usuarios", require("./routes/Usuarios"));
 app.use("/api/auth", require("./routes/Auth"));
+app.use("/api/direcciones", require("./routes/Direcciones"));
 app.use("/public", express.static(`${__dirname}/uploads`)); // Habilitar carpeta publica
 // Arrancar la app
 app.listen(port, "0.0.0.0", () => {
