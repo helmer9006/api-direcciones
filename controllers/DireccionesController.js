@@ -10,7 +10,6 @@ const traerCoordenadas = async (req, res) => {
   //Valido perfil
   if (perfil == "administrador") {
     const UrlHere = `https://geocode.search.hereapi.com/v1/geocode?q=${direccion}&apiKey=${KEY_API_HERE}`;
-    console.log(UrlHere);
     try {
       const {
         data: { items },
@@ -52,6 +51,32 @@ const traerCoordenadas = async (req, res) => {
   }
 };
 
+const traerDireccion = async (req, res) => {
+  console.log("GET - TRAER COORDENADA DE BUSQUEDA ");
+  const { perfil, nombre } = req.usuario;
+  const longitude = req.params.longitude;
+  const latitude = req.params.latitude;
+
+  //Valido perfil
+  if (perfil == "administrador") {
+    const UrlHere = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${TOKEN_API_MAPBOX}`;
+
+    try {
+      const { data } = await axios(UrlHere);
+      return res.status(200).json(data);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ msg: `Ha ocurrido un error`, error: error });
+    }
+  } else {
+    return res.status(403).json({
+      msg: `Acceso no autorizado, el usuario ${nombre} con perfil ${perfil} no tiene autorización para realizar la consulta`,
+    });
+  }
+};
 module.exports = {
   traerCoordenadas,
+  traerDireccion,
 };
