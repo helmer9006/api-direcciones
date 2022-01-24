@@ -5,50 +5,62 @@ const { validationResult } = require("express-validator");
 const nuevoUsuario = async (req, res) => {
   // Mostrar mensajes de error de express validator
   console.log("POST - CREAR USUARIO");
-  const errores = validationResult(req);
-  if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
-  }
+  const { perfil, nombre } = req.usuario;
+  //Valido perfil
+  if (perfil == "administrador") {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) {
+      return res.status(400).json({ errores: errores.array() });
+    }
 
-  // Verificar si el usuario ya estuvo registrado
-  const { email, password, identificacion } = req.body;
+    // Verificar si el usuario ya estuvo registrado
+    const { email, password, identificacion } = req.body;
 
-  //validar que el usuario no esté creado previamente
+    //validar que el usuario no esté creado previamente
 
-  // return
+    // return
 
-  let usuario = await Usuario.findOne({ $or: [{ email }, { identificacion }] });
-  if (usuario) {
-    return res.status(400).json({ msg: "El usuario ya esta registrado" });
-  }
+    let usuario = await Usuario.findOne({
+      $or: [{ email }, { identificacion }],
+    });
+    if (usuario) {
+      return res.status(400).json({ msg: "El usuario ya esta registrado" });
+    }
 
-  // Crear un nuevo usuario
-  usuario = new Usuario(req.body);
+    // Crear un nuevo usuario
+    usuario = new Usuario(req.body);
 
-  if (req.foto !== "") {
-    usuario.setFotoUrl(req.filename);
-  }
+    if (req.foto !== "") {
+      usuario.setFotoUrl(req.filename);
+    }
 
-  // Hashear el password
-  const salt = await bcrypt.genSalt(10);
-  usuario.password = await bcrypt.hash(password, salt);
+    // Hashear el password
+    const salt = await bcrypt.genSalt(10);
+    usuario.password = await bcrypt.hash(password, salt);
 
-  try {
-    await usuario.save();
-    res.json({ msg: "Usuario Creado Correctamente" });
-  } catch (error) {
-    return res.status(500).json({ msg: `Ha ocurrido un error`, error: error });
+    try {
+      await usuario.save();
+      res.json({ msg: "Usuario Creado Correctamente" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ msg: `Ha ocurrido un error en el servidor`, error: error });
+    }
+  } else {
+    return res.status(403).json({
+      msg: `Acceso no autorizado, el usuario ${nombre} con perfil ${perfil} no tiene autorización para actualizar un usuario`,
+    });
   }
 };
 
 //***************MODIFICAR USUARIO***************
 const actualizarUsuario = async (req, res) => {
   console.log("PUT - ACTUALIZAR USUARIO POR ID");
+
   let usuario = req.body;
   let password = req.body.password;
   const idUsuario = req.body._id;
   usuario.actualizacion = Date.now();
-  console.log(usuario);
 
   if (password) {
     // Hashear el password
