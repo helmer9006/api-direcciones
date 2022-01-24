@@ -27,7 +27,10 @@ router.post(
 );
 
 //DEVUELVE TODOS LOS USUARIOS
-router.get("/", auth, usuarioController.traerUsuario);
+router.get("/", auth, usuarioController.traerUsuarios);
+
+//DEVUELVE UN USUARIO POR ID
+router.get("/:usuarioId", auth, usuarioController.traerUsuarioxId);
 
 //ACTUALIZAR USUARIO POR ID
 router.put("/", auth, createFoto, usuarioController.actualizarUsuario);

@@ -94,7 +94,8 @@ const actualizarUsuario = async (req, res) => {
   }
 };
 
-const traerUsuario = async (req, res) => {
+const traerUsuarios = async (req, res) => {
+  console.log("GET - TRAER TODOS LOS USUARIOS");
   const { perfil, nombre } = req.usuario;
   //Valido perfil
   if (perfil == "administrador") {
@@ -111,8 +112,29 @@ const traerUsuario = async (req, res) => {
   }
 };
 
+const traerUsuarioxId = async (req, res) => {
+  console.log("GET - TRAER USUARIOS X ID");
+  const { perfil, nombre } = req.usuario;
+  const usuarioId = req.params.usuarioId;
+
+  //Valido perfil
+  if (perfil == "administrador") {
+    try {
+      const usuarios = await Usuario.find({ _id: usuarioId });
+      res.status(200).json(usuarios);
+    } catch (error) {
+      return res.status(500).json({ msg: `Ha ocurrido un error, ${error} ` });
+    }
+  } else {
+    return res.status(403).json({
+      msg: `Acceso no autorizado, el usuario ${nombre} con perfil ${perfil} no tiene autorización para listar los usuarios`,
+    });
+  }
+};
+
 module.exports = {
   nuevoUsuario,
-  traerUsuario,
+  traerUsuarios,
   actualizarUsuario,
+  traerUsuarioxId,
 };
