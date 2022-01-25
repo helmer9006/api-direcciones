@@ -44,7 +44,7 @@ exports.autenticarUsuario = async (req, res, next) => {
 
     res.json({ token });
   } else {
-    res.status(401).json({ msg: "Password Incorrecto" });
+    res.status(401).json({ msg: "Email o Password Incorrecto" });
     return next();
   }
 };
